@@ -13,10 +13,11 @@
     - [Portfolio Value](#portfolio-value)
     - [Evaluation of Opportunity](#evaluation-of-opportunity)
     - [Compound Interest](#compound-interest)
-    - [Monthly Invesment](#compound-interest)
+    - [Monthly Investment](#monthly-investment)
     - [Loan Cost](#loan-cost)
     - [About](#about)
   - [Running Locally](#running-locally)
+  - [Example of Usage](#example-of-usage)
   - [Deployment](#deployment)
   - [Notes](#notes)
   - [Resources](#resources)
@@ -24,9 +25,11 @@
 
 ## Investment Helper REST API
 This project implements a simple REST web service deployed on Vercel using Flask.  
-The service aggregates data from multiple public APIs and applies custom logic to provide meaningful responses.
+The service aggregates data from multiple public APIs and applies custom logic to provide meaningful responses. The service also integrates an additional external API (weather service) as a hidden feature within the `/about` endpoint.
 
-You can try the implemented service at [https://pa053-3.vercel.app/](https://pa053-3.vercel.app/)
+You can try the implemented service at [https://pa053-3.vercel.app/](https://pa053-3.vercel.app/), service is deployed thru GitHub repository avalaible at [https://github.com/Doly02/pa053-3](https://github.com/Doly02/pa053-3)
+
+The system acts as a middleware layer that aggregates and enriches data from multiple external services and applies custom business logic.
 
 ### Description
 
@@ -166,16 +169,35 @@ It uses the **Stooq API** (CSV-based) to retrieve stock prices and calculate dai
 **Description:** Provides information about the service, author, and available endpoints.  
 **Response:**  
 ```json
-"endpoints": {
-  "queryStockSummary": { "example": "/?queryStockSummary=AAPL" },
-  "queryPortfolioValue": { "example": "/?queryPortfolioValue=AAPL:2,MSFT:3" },
-  "queryStockWithFX": { "example": "/?queryStockWithFX=AAPL" },
-  "queryEvaluateOpportunity": { "example": "/?queryEvaluateOpportunity=AAPL" },
-  "queryCompoundInterest": { "example": "/?queryCompoundInterest=10000,7,10" },
-  "queryMonthlyInvestment": { "example": "/?queryMonthlyInvestment=2000,8,15" },
-  "queryLoanCost": { "example": "/?queryLoanCost=100000,6,5" }
-}
+    "service": "Investment Helper API",
+    "author": "Tomas Dolak",
+    "description": "REST API for stock data, portfolio analysis and investment calculations.",
+    "in_case_you_care": {
+        "message": "Current weather in Prague Airport",
+         "data": {
+            "airport": "PRG",
+            "city": "Prague",
+            "temperature_C": "18"
+        }
+    }
+    "endpoints": {
+        "queryStockSummary": { "example": "/?queryStockSummary=AAPL" },
+        "queryPortfolioValue": { "example": "/?queryPortfolioValue=AAPL:2,MSFT:3" },
+        "queryStockWithFX": { "example": "/?queryStockWithFX=AAPL" },
+        "queryEvaluateOpportunity": { "example": "/?queryEvaluateOpportunity=AAPL" },
+        "queryCompoundInterest": { "example": "/?queryCompoundInterest=10000,7,10" },
+        "queryMonthlyInvestment": { "example": "/?queryMonthlyInvestment=2000,8,15" },
+        "queryLoanCost": { "example": "/?queryLoanCost=100000,6,5" }
+    }
 ```
+
+### Example of Usage
+The following example demonstrate how to interact with the deployed REST API:
+```
+https://pa053-3.vercel.app/?queryMonthlyInvestment=2000,8,15
+```
+All endpoints can be tested directly via browser by using the following base URL:
+https://pa053-3.vercel.app/
 
 ### Running Locally
 1. Install `requirements.txt`

@@ -144,16 +144,16 @@ def evaluate_opportunity(symbol):
             trend = "stable"
             summary = "The stock is relatively stable today. There is no strong short-term movement visible from the current price change."
 
-            return {
-                "symbol": symbol.upper(),
-                "name": stock.get("shortName", "N/A"),
-                "price_usd": price_usd,
-                "price_czk": round(price_czk, 2),
-                "change_percent": round(change_percentage, 2),
-                "fx_rate_usd_czk": round(fx_rate, 4),
-                "trend": trend,
-                "summary": summary
-            }
+        return {
+            "symbol": symbol.upper(),
+            "name": stock.get("shortName", "N/A"),
+            "price_usd": price_usd,
+            "price_czk": round(price_czk, 2),
+            "change_percent": round(change_percentage, 2),
+            "fx_rate_usd_czk": round(fx_rate, 4),
+            "trend": trend,
+            "summary": summary
+        }
 
     except Exception as e:
         return {"ERR": str(e)}
@@ -224,6 +224,41 @@ def loan_cost(query):
     except Exception as e:
         return {"ERR": str(e)}
 
+def airport_temp(code):
+    try:
+        airports = {
+            "PRG": "Prague",
+            "VIE": "Vienna",
+            "LHR": "London",
+            "JFK": "New York",
+            "CDG": "Paris",
+            "FRA": "Frankfurt",
+            "AMS": "Amsterdam",
+            "MAD": "Madrid",
+            "BCN": "Barcelona",
+            "DXB": "Dubai",
+            "HND": "Tokyo",
+            "SIN": "Singapore",
+            "LAX": "Los Angeles"
+        }
+
+        selected_city = airports.get(code.upper(), code)
+
+        url = f"https://wttr.in/{selected_city}?format=j1"
+        response = requests.get(url, timeout=10)
+        data = response.json()
+
+        temp = data["current_condition"][0]["temp_C"]
+
+        return {
+            "airport": code.upper(),
+            "city": selected_city,
+            "temperature_C": temp
+        }
+
+    except Exception as e:
+        return {"ERR": str(e)}
+
 @app.route('/')
 def home():
     q_summary = request.args.get("queryStockSummary")
@@ -262,10 +297,20 @@ def home():
 
 @app.route('/about')
 def about():
+
+    try:
+        weather = airport_temp("PRG")
+    except Exception:
+        weather = "Weather service temporarily unavailable"
+
     return {
         "service": "Investment Helper API",
         "author": "Tomas Dolak",
         "description": "REST API for stock data, portfolio analysis and investment calculations.",
+        "in_case_you_care": {
+            "message": "Current weather in Prague Airport",
+            "data": weather
+        },
         "endpoints": {
             "queryStockSummary": {
                 "description": "Get stock price summary",
