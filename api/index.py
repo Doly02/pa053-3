@@ -75,26 +75,25 @@ def airport_temp(code):
     code: The IATA airport code (e.g., "PRG" for Prague).
     """
     try:
+
         airport_url = f"https://airport-data.com/api/ap_info.json?iata={code.upper()}"
         r = requests.get(airport_url, timeout=10)
         airport_data = r.json()
 
-        lat = airport_data.get("lat")
-        lon = airport_data.get("lon")
+        if "city" not in airport_data:
+            raise ValueError("Invalid airport code")
 
-        if not lat or not lon:
-            raise ValueError("Invalid airport data")
+        city = airport_data["city"]
 
-        weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+        weather_url = f"https://wttr.in/{city}?format=j1"
         r = requests.get(weather_url, timeout=10)
         weather_data = r.json()
 
-        temp = weather_data["current_weather"]["temperature"]
-
+        temp = weather_data["current_condition"][0]["temp_C"]
         return float(temp)
-    except Exception:
-        return 0.0
 
+    except Exception:
+        return 0
 
 @app.route('/')
 def home():
