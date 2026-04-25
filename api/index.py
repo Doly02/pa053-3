@@ -12,9 +12,8 @@ ALLOWED_OPERATORS = {
     ast.Div: op.truediv,
     ast.USub: op.neg,
 }
-app = Flask(__name__)
 
-PERCENTAGE_THRESHOLD = -5  # Threshold for evaluating investment opportunity
+app = Flask(__name__)
 
 def get_stock_price(symbol):
     """
@@ -43,33 +42,40 @@ def get_stock_price(symbol):
         "regularMarketChangePercent": change_percent
     }
 
-def evaluate_expression(expression):
+def get_eval_node(node):
+    """
+    Recursively evaluate an AST node, allowing only safe operations.
+    node: An AST node to evaluate.
+    """
+    if isinstance(node, ast.Constant) and isinstance(node.value, int):
+        return node.value
+
+    if isinstance(node, ast.BinOp) and type(node.op) in ALLOWED_OPERATORS:
+        return ALLOWED_OPERATORS[type(node.op)](
+            get_eval_node(node.left),
+            get_eval_node(node.right)
+        )
+
+    if isinstance(node, ast.UnaryOp) and type(node.op) in ALLOWED_OPERATORS:
+        return ALLOWED_OPERATORS[type(node.op)](get_eval_node(node.operand))
+
+    if isinstance(node, ast.Expression):
+        return get_eval_node(node.body)
+
+    raise ValueError("Invalid expression")
+
+
+def get_evaluation(expression):
     """
     Evaluate a mathematical expression safely using the ast module.
-    expression: A string containing the mathematical expression to evaluate (e.g., "2 + 3 * (4 - 1)").
+    expression: A string containing the mathematical expression to evaluate.
     """
-
-    def eval_node(node):
-        if isinstance(node, ast.Constant) and isinstance(node.value, int):
-            return node.value
-        if isinstance(node, ast.BinOp) and type(node.op) in ALLOWED_OPERATORS:
-            return ALLOWED_OPERATORS[type(node.op)](
-                eval_node(node.left),
-                eval_node(node.right)
-            )
-        if isinstance(node, ast.UnaryOp) and type(node.op) in ALLOWED_OPERATORS:
-            return ALLOWED_OPERATORS[type(node.op)](eval_node(node.operand))
-        if isinstance(node, ast.Expression):
-            return eval_node(node.body)
-
-        raise ValueError("Invalid expression")
-
     tree = ast.parse(expression, mode="eval")
-    return eval_node(tree)
+    return get_eval_node(tree)
 
 
 
-def airport_temp(code):
+def get_airport_temp(code):
     """
     Get the current temperature in Celsius for a given airport code using wttr.in API.
     code: The IATA airport code (e.g., "PRG" for Prague).
@@ -77,8 +83,8 @@ def airport_temp(code):
     try:
 
         airport_url = f"https://airport-data.com/api/ap_info.json?iata={code.upper()}"
-        r = requests.get(airport_url, timeout=10)
-        airport_data = r.json()
+        response = requests.get(airport_url, timeout=10)
+        airport_data = response.json()
 
         location = airport_data.get("location")
 
@@ -87,8 +93,8 @@ def airport_temp(code):
         city = location.split(",")[0]
 
         weather_url = f"https://wttr.in/{city}?format=j1"
-        r = requests.get(weather_url, timeout=10)
-        weather_data = r.json()
+        response = requests.get(weather_url, timeout=10)
+        weather_data = response.json()
 
         temp = weather_data["current_condition"][0]["temp_C"]
         return float(temp)
@@ -100,10 +106,10 @@ def airport_temp(code):
 def home():
     q_airport = request.args.get("queryAirportTemp")
     q_stock = request.args.get("queryStockPrice")
-    q_eval = request.args.get("queryEval")
+    q_evaluation = request.args.get("queryEval")
 
     if q_airport:
-        temp = airport_temp(q_airport)
+        temp = get_airport_temp(q_airport)
         if temp is None:
             return jsonify(0)
         
@@ -111,8 +117,8 @@ def home():
     if q_stock:
         return jsonify(float(get_stock_price(q_stock)["regularMarketPrice"]))
 
-    if q_eval:
-        return jsonify(float(evaluate_expression(q_eval)))
+    if q_evaluation:
+        return jsonify(float(get_evaluation(q_evaluation)))
 
     temp = None
     return jsonify(temp)
