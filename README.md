@@ -8,14 +8,9 @@
 - [Investment Helper REST API](#investment-helper-rest-api)
   - [Description](#description)
   - [Implemented Endpoints](#implemented-endpoints)
-    - [Stock Summary](#stock-summary)
-    - [Stock Price with Currency Conversion](#stock-price-with-currency-conversion)
-    - [Portfolio Value](#portfolio-value)
-    - [Evaluation of Opportunity](#evaluation-of-opportunity)
-    - [Compound Interest](#compound-interest)
-    - [Monthly Investment](#monthly-investment)
-    - [Loan Cost](#loan-cost)
-    - [About](#about)
+    - [Airport Temperature](#airport-temperature)
+    - [Stock Price](#stock-price)
+    - [Expression Evaluation](#expression-evaluation)
   - [Running Locally](#running-locally)
   - [Example of Usage](#example-of-usage)
   - [Deployment](#deployment)
@@ -24,8 +19,9 @@
 
 
 ## Investment Helper REST API
-This project implements a simple REST web service deployed on Vercel using Flask.  
-The service aggregates data from multiple public APIs and applies custom logic to provide meaningful responses. The service also integrates an additional external API (weather service) as a hidden feature within the `/about` endpoint.
+This project implements a simple REST service using Flask and deployed on Vercel.  
+The goal is to provide practical experience with creating a web service that integrates multiple external APIs and performs computation.
+
 
 You can try the implemented service at [https://pa053-3.vercel.app/](https://pa053-3.vercel.app/), service is deployed thru GitHub repository avalaible at [https://github.com/Doly02/pa053-3](https://github.com/Doly02/pa053-3)
 
@@ -39,162 +35,42 @@ The application demonstrates principles of distributed systems and middleware:
 - Data aggregation and transformation
 - Stateless request processing
 
-### Implemented Endpoints
+## Supported Query Parameters
 
-This API integrates with external services to provide stock data and currency conversion functionality.  
-It uses the **Stooq API** (CSV-based) to retrieve stock prices and calculate daily changes, and the **ExchangeRate API (open.er-api.com)** to obtain current USD to CZK exchange rates.
+The service recognizes exactly three query parameters.  
+Only one parameter should be present in a request.
 
-#### Stock Summary
-**Endpoint:** `GET /?queryStockSummary={symbol}`  
-**Description:** Retrieves a summary of the stock including current price, percentage change, and company name.  
-**Example:** `GET /?queryStockSummary=AAPL`  
+#### Airport Temperature
+**Endpoint:** `GET /?queryAirportTemp={IATA_CODE}`  
+**Description:** Returns the current temperature (in °C) for a given airport.  
+**Example:** `GET /?queryAirportTemp=PRG`  
 **Example Response:**  
 ```json
-{
-  "symbol": "AAPL",
-  "price": 150.25,
-  "change": 2.5,
-  "name": "Apple Inc."
-}
+8
 ```
 
-#### Stock Price with Currency Conversion
-**Endpoint:** `GET /?queryStockWithFX={symbol}`  
-**Description:** Gets the stock price in USD and converts it to CZK using the current exchange rate.  
-**Example:** `GET /?queryStockWithFX=AAPL`  
+#### Stock Price
+**Endpoint:** `GET /?queryStockPrice={symbol}`  
+**Description:** Returns the current stock price..  
+**Example:** `GET /?queryStockPrice=AAPL`  
 **Example Response:**  
 ```json
-{
-  "symbol": "AAPL",
-  "price_usd": 150.25,
-  "price_czk": 3756.25,
-  "fx_rate": 25.0
-}
+247.77
 ```
 
-#### Portfolio Value
-**Endpoint:** `GET /?queryPortfolioValue={symbols}`  
-**Description:** Calculates the total value of a portfolio. Supports specifying quantity of each stock using the format `SYMBOL:QUANTITY`. If quantity is not provided, it defaults to 1.
-**Example:** `GET /?queryPortfolioValue=AAPL:2,MSFT:3`  
+#### Expression Evaluation
+**Endpoint:** `GET /?queryEval={expression}`  
+**Description:** Evaluates an arithmetic expression. Supported operations are addition, substraction, multiplication, division and parentheses.
+**Example:** `GET /?queryEval=10%2B(5*2)`  
 **Example Response:** 
 ```json
-{
-  "portfolio_value_usd": 1800.5,
-  "stocks": [
-    {
-      "symbol": "AAPL",
-      "quantity": 2,
-      "price": 190.12,
-      "value": 380.24,
-      "weight_percent": 21.1
-    },
-    {
-      "symbol": "MSFT",
-      "quantity": 3,
-      "price": 473.42,
-      "value": 1420.26,
-      "weight_percent": 78.9
-    }
-  ]
-}
-```
-
-#### Evaluation of Opportunity
-**Endpoint:** `GET /?queryEvaluateOpportunity={symbol}`  
-**Description:** Evaluates if the stock is a good investment opportunity based on its recent price change and provides a summary.  
-**Example:** `GET /?queryEvaluateOpportunity=AAPL`  
-**Example Response:**   
-```json
-{
-  "symbol": "AAPL",
-  "name": "Apple Inc.",
-  "price_usd": 150.25,
-  "price_czk": 3756.25,
-  "change_percent": 2.5,
-  "fx_rate_usd_czk": 25.0,
-  "trend": "rising",
-  "summary": "The stock is currently rising. It may indicate positive market sentiment, but buying after a strong move can be riskier."
-}
-```
-
-#### Compound Interest
-**Endpoint:** `GET /?queryCompoundInterest={principal,rate,years}`  
-**Description:** Calculates compound interest for a given initial investment.  
-**Example:** `GET /?queryCompoundInterest=10000,7,10`  
-**Example Response:**  
-```json
-{
-  "principal": 10000,
-  "annual_rate_percent": 7,
-  "years": 10,
-  "final_amount": 19671.51,
-  "profit": 9671.51
-}
-```
-
-#### Monthly Investment
-**Endpoint:** `GET /?queryMonthlyInvestment={amount,rate,years}`  
-**Description:** Calculates the future value of regular monthly investments.
-**Example:** `GET /?queryMonthlyInvestment=2000,8,15`  
-**Example Response:**  
-```json
-{
-  "monthly_payment": 2000,
-  "annual_rate_percent": 8,
-  "years": 15,
-  "invested_amount": 360000,
-  "final_amount": 694047.75,
-  "profit": 334047.75
-}
-```
-
-#### Loan Cost
-**Endpoint:** `GET /?queryLoanCost={amount,rate,years}`  
-**Description:** Calculates the total cost of a loan including interest.
-**Example:** `GET /?queryLoanCost=100000,6,5`  
-**Example Response:**  
-```json
-{
-  "loan_amount": 100000,
-  "annual_rate_percent": 6,
-  "years": 5,
-  "monthly_payment": 1933.28,
-  "total_paid": 115996.8,
-  "total_interest": 15996.8
-}
-```
-
-#### About
-**Endpoint:** `GET /about`  
-**Description:** Provides information about the service, author, and available endpoints.  
-**Response:**  
-```json
-    "service": "Investment Helper API",
-    "author": "Tomas Dolak",
-    "description": "REST API for stock data, portfolio analysis and investment calculations.",
-    "in_case_you_care": {
-        "message": "Current weather in Prague Airport",
-         "data": {
-            "airport": "PRG",
-            "city": "Prague",
-            "temperature_C": "18"
-        }
-    }
-    "endpoints": {
-        "queryStockSummary": { "example": "/?queryStockSummary=AAPL" },
-        "queryPortfolioValue": { "example": "/?queryPortfolioValue=AAPL:2,MSFT:3" },
-        "queryStockWithFX": { "example": "/?queryStockWithFX=AAPL" },
-        "queryEvaluateOpportunity": { "example": "/?queryEvaluateOpportunity=AAPL" },
-        "queryCompoundInterest": { "example": "/?queryCompoundInterest=10000,7,10" },
-        "queryMonthlyInvestment": { "example": "/?queryMonthlyInvestment=2000,8,15" },
-        "queryLoanCost": { "example": "/?queryLoanCost=100000,6,5" }
-    }
+20
 ```
 
 ### Example of Usage
 The following example demonstrate how to interact with the deployed REST API:
 ```
-https://pa053-3.vercel.app/?queryMonthlyInvestment=2000,8,15
+https://pa053-3.vercel.app/?queryEval=10%2B(5*2)
 ```
 All endpoints can be tested directly via browser by using the following base URL:
 https://pa053-3.vercel.app/
@@ -224,6 +100,8 @@ The service is designed as a stateless application, which means that each reques
 
 [2] "Vercel: Using the REST API" [online]. [cited 2026-04-25]. Available at [https://vercel.com/docs/rest-api](https://vercel.com/docs/rest-api)
 
-[3] "Stooq Stock Data API" [online]. Available at [https://stooq.com/](https://stooq.com/)
+[3] "Wttr.in" [online]. Available at [https://wttr.in/](https://wttr.in/)
 
-[4] "ExchangeRate API (open.er-api.com)" [online]. Available at [https://open.er-api.com/](https://open.er-api.com/)
+[4] "Airport Data" [online]. Available at [https://airport-data.com/](https://airport-data.com/)
+
+[5] "Stooq Stock Data API" [online]. Available at [https://stooq.com/](https://stooq.com/)
