@@ -93,7 +93,7 @@ def airport_temp(code):
         return float(temp)
 
     except Exception:
-        return None
+        return 0
 
 @app.route('/')
 def home():
@@ -103,12 +103,14 @@ def home():
 
     if q_airport:
         temp = airport_temp(q_airport)
-        return jsonify(temp)
-
+        if temp is None:
+            return jsonify(0)
+        return jsonify(float(temp))
     if q_stock:
         return jsonify(float(get_stock_price(q_stock)["regularMarketPrice"]))
 
     if q_eval:
         return jsonify(float(evaluate_expression(q_eval)))
 
-    return jsonify(None)
+    temp = None
+    return jsonify(temp)
