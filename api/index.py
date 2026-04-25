@@ -265,13 +265,35 @@ def about():
     return {
         "service": "Investment Helper API",
         "author": "Tomas Dolak",
-        "endpoints": [
-            "queryStockSummary",
-            "queryPortfolioValue",
-            "queryStockWithFX",
-            "queryEvaluateOpportunity",
-            "queryCompoundInterest",
-            "queryMonthlyInvestment",
-            "queryLoanCost"
-        ]
+        "description": "REST API for stock data, portfolio analysis and investment calculations.",
+        "endpoints": {
+            "queryStockSummary": {
+                "description": "Get stock price summary",
+                "example": "/?queryStockSummary=AAPL"
+            },
+            "queryPortfolioValue": {
+                "description": "Calculate portfolio value (supports quantities)",
+                "example": "/?queryPortfolioValue=AAPL:2,MSFT:3"
+            },
+            "queryStockWithFX": {
+                "description": "Stock price converted to CZK",
+                "example": "/?queryStockWithFX=AAPL"
+            },
+            "queryEvaluateOpportunity": {
+                "description": "Evaluate investment opportunity",
+                "example": "/?queryEvaluateOpportunity=AAPL"
+            },
+            "queryCompoundInterest": {
+                "description": "Compound interest calculation",
+                "example": "/?queryCompoundInterest=10000,7,10"
+            },
+            "queryMonthlyInvestment": {
+                "description": "Monthly investment growth",
+                "example": "/?queryMonthlyInvestment=2000,8,15"
+            },
+            "queryLoanCost": {
+                "description": "Loan cost calculation",
+                "example": "/?queryLoanCost=100000,6,5"
+            }
+        }
     }

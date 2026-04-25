@@ -12,6 +12,9 @@
     - [Stock Price with Currency Conversion](#stock-price-with-currency-conversion)
     - [Portfolio Value](#portfolio-value)
     - [Evaluation of Opportunity](#evaluation-of-opportunity)
+    - [Compound Interest](#compound-interest)
+    - [Monthly Invesment](#compound-interest)
+    - [Loan Cost](#loan-cost)
     - [About](#about)
   - [Running Locally](#running-locally)
   - [Deployment](#deployment)
@@ -110,20 +113,66 @@ It uses the **Stooq API** (CSV-based) to retrieve stock prices and calculate dai
 }
 ```
 
+#### Compound Interest
+**Endpoint:** `GET /?queryCompoundInterest={principal,rate,years}`  
+**Description:** Calculates compound interest for a given initial investment.  
+**Example:** `GET /?queryCompoundInterest=10000,7,10`  
+**Example Response:**  
+```json
+{
+  "principal": 10000,
+  "annual_rate_percent": 7,
+  "years": 10,
+  "final_amount": 19671.51,
+  "profit": 9671.51
+}
+```
+
+#### Monthly Investment
+**Endpoint:** `GET /?queryMonthlyInvestment={amount,rate,years}`  
+**Description:** Calculates the future value of regular monthly investments.
+**Example:** `GET /?queryMonthlyInvestment=2000,8,15`  
+**Example Response:**  
+```json
+{
+  "monthly_payment": 2000,
+  "annual_rate_percent": 8,
+  "years": 15,
+  "invested_amount": 360000,
+  "final_amount": 694047.75,
+  "profit": 334047.75
+}
+```
+
+#### Loan Cost
+**Endpoint:** `GET /?queryLoanCost={amount,rate,years}`  
+**Description:** Calculates the total cost of a loan including interest.
+**Example:** `GET /?queryLoanCost=100000,6,5`  
+**Example Response:**  
+```json
+{
+  "loan_amount": 100000,
+  "annual_rate_percent": 6,
+  "years": 5,
+  "monthly_payment": 1933.28,
+  "total_paid": 115996.8,
+  "total_interest": 15996.8
+}
+```
+
 #### About
 **Endpoint:** `GET /about`  
 **Description:** Provides information about the service, author, and available endpoints.  
 **Response:**  
 ```json
-{
-  "service": "Investment Helper API",
-  "author": "Tomas Dolak",
-  "endpoints": [
-    "queryStockSummary",
-    "queryPortfolioValue",
-    "queryStockWithFX",
-    "queryEvaluateOpportunity"
-  ]
+"endpoints": {
+  "queryStockSummary": { "example": "/?queryStockSummary=AAPL" },
+  "queryPortfolioValue": { "example": "/?queryPortfolioValue=AAPL:2,MSFT:3" },
+  "queryStockWithFX": { "example": "/?queryStockWithFX=AAPL" },
+  "queryEvaluateOpportunity": { "example": "/?queryEvaluateOpportunity=AAPL" },
+  "queryCompoundInterest": { "example": "/?queryCompoundInterest=10000,7,10" },
+  "queryMonthlyInvestment": { "example": "/?queryMonthlyInvestment=2000,8,15" },
+  "queryLoanCost": { "example": "/?queryLoanCost=100000,6,5" }
 }
 ```
 
@@ -155,5 +204,3 @@ The service is designed as a stateless application, which means that each reques
 [3] "Stooq Stock Data API" [online]. Available at [https://stooq.com/](https://stooq.com/)
 
 [4] "ExchangeRate API (open.er-api.com)" [online]. Available at [https://open.er-api.com/](https://open.er-api.com/)
-
-[5] "exchangerate.host: Real-time current and historical foreign exchange & crypto rates data solution." [online]. [cited 2026-04-25]. Available at [https://exchangerate.host/](https://exchangerate.host/)
