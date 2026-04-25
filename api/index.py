@@ -158,6 +158,71 @@ def evaluate_opportunity(symbol):
     except Exception as e:
         return {"ERR": str(e)}
 
+def compound_interest(query):
+    try:
+        principal, annual_rate, years = query.split(",")
+        principal = float(principal)
+        annual_rate = float(annual_rate) / 100
+        years = int(years)
+
+        final_amount = principal * ((1 + annual_rate) ** years)
+        profit = final_amount - principal
+
+        return {
+            "principal": principal,
+            "annual_rate_percent": annual_rate * 100,
+            "years": years,
+            "final_amount": round(final_amount, 2),
+            "profit": round(profit, 2)
+        }
+    except Exception as e:
+        return {"ERR": str(e)}
+
+
+def monthly_investment(query):
+    try:
+        monthly_payment, annual_rate, years = query.split(",")
+        monthly_payment = float(monthly_payment)
+        monthly_rate = (float(annual_rate) / 100) / 12
+        months = int(years) * 12
+
+        final_amount = monthly_payment * (((1 + monthly_rate) ** months - 1) / monthly_rate)
+        invested_amount = monthly_payment * months
+        profit = final_amount - invested_amount
+
+        return {
+            "monthly_payment": monthly_payment,
+            "annual_rate_percent": float(annual_rate),
+            "years": int(years),
+            "invested_amount": round(invested_amount, 2),
+            "final_amount": round(final_amount, 2),
+            "profit": round(profit, 2)
+        }
+    except Exception as e:
+        return {"ERR": str(e)}
+
+
+def loan_cost(query):
+    try:
+        principal, annual_rate, years = query.split(",")
+        principal = float(principal)
+        monthly_rate = (float(annual_rate) / 100) / 12
+        months = int(years) * 12
+
+        monthly_payment = principal * (monthly_rate * (1 + monthly_rate) ** months) / (((1 + monthly_rate) ** months) - 1)
+        total_paid = monthly_payment * months
+        total_interest = total_paid - principal
+
+        return {
+            "loan_amount": principal,
+            "annual_rate_percent": float(annual_rate),
+            "years": int(years),
+            "monthly_payment": round(monthly_payment, 2),
+            "total_paid": round(total_paid, 2),
+            "total_interest": round(total_interest, 2)
+        }
+    except Exception as e:
+        return {"ERR": str(e)}
 
 @app.route('/')
 def home():
@@ -165,6 +230,9 @@ def home():
     q_portfolio = request.args.get("queryPortfolioValue")
     q_fx = request.args.get("queryStockWithFX")
     q_eval_opportunity = request.args.get("queryEvaluateOpportunity")
+    q_compound = request.args.get("queryCompoundInterest")
+    q_monthly = request.args.get("queryMonthlyInvestment")
+    q_loan = request.args.get("queryLoanCost")
 
     if q_summary:
         return jsonify(stock_summary(q_summary))
@@ -179,8 +247,17 @@ def home():
     if q_eval_opportunity:
         return jsonify(evaluate_opportunity(q_eval_opportunity))
 
+    if q_compound:
+        return jsonify(compound_interest(q_compound))
+
+    if q_monthly:
+        return jsonify(monthly_investment(q_monthly))
+
+    if q_loan:
+        return jsonify(loan_cost(q_loan))
+
     return jsonify({
-        "message": "Use queryStockSummary, queryPortfolioValue, queryStockWithFX or queryEvaluateOpportunity query parameters to get stock information."
+        "message": "Use queryStockSummary, queryPortfolioValue, queryStockWithFX, queryEvaluateOpportunity, queryCompoundInterest, queryMonthlyInvestment or queryLoanCost query parameters."
     })
 
 @app.route('/about')
@@ -192,6 +269,9 @@ def about():
             "queryStockSummary",
             "queryPortfolioValue",
             "queryStockWithFX",
-            "queryEvaluateOpportunity"
+            "queryEvaluateOpportunity",
+            "queryCompoundInterest",
+            "queryMonthlyInvestment",
+            "queryLoanCost"
         ]
     }
