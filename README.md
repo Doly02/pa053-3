@@ -94,6 +94,7 @@ It uses the **Stooq API** (CSV-based) to retrieve stock prices and calculate dai
     }
   ]
 }
+```
 
 #### Evaluation of Opportunity
 **Endpoint:** `GET /?queryEvaluateOpportunity={symbol}`  
