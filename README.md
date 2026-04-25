@@ -136,7 +136,11 @@ The service is designed as a stateless application, which means that each reques
 
 ### Resources
 [1] "Vercel: Build and deploy on the AI Cloud" [online]. [cited 2026-04-25]. Available at [https://vercel.com/](https://vercel.com/)
+
 [2] "Vercel: Using the REST API" [online]. [cited 2026-04-25]. Available at [https://vercel.com/docs/rest-api](https://vercel.com/docs/rest-api)
+
 [3] "Apify: Yahoo Finance API" [online]. [cited 2026-04-25]. Available at [https://apify.com/api/yahoo-finance-api](https://apify.com/api/yahoo-finance-api)
+
 [4] "Github: yfinance" [online]. [cited 2026-04-25]. Available at [https://github.com/ranaroussi/yfinance](https://github.com/ranaroussi/yfinance)
+
 [5] "exchangerate.host: Real-time current and historical foreign exchange & crypto rates data solution." [online]. [cited 2026-04-25]. Available at [https://exchangerate.host/](https://exchangerate.host/)
