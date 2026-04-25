@@ -23,6 +23,8 @@
 This project implements a simple REST web service deployed on Vercel using Flask.  
 The service aggregates data from multiple public APIs and applies custom logic to provide meaningful responses.
 
+You can try the implemented service at [https://pa053-3.vercel.app/](https://pa053-3.vercel.app/)
+
 ### Description
 
 The application demonstrates principles of distributed systems and middleware:
@@ -33,7 +35,8 @@ The application demonstrates principles of distributed systems and middleware:
 
 ### Implemented Endpoints
 
-This API integrates with external services to provide comprehensive stock data and currency conversion functionality. It utilizes the `Yahoo Finance` API to retrieve real-time stock prices, percentage changes, and company information, and the `exchangerate.host` API to obtain current USD to CZK exchange rates for accurate currency conversions.
+This API integrates with external services to provide stock data and currency conversion functionality.  
+It uses the **Stooq API** (CSV-based) to retrieve stock prices and calculate daily changes, and the **ExchangeRate API (open.er-api.com)** to obtain current USD to CZK exchange rates.
 
 #### Stock Summary
 **Endpoint:** `GET /?queryStockSummary={symbol}`  
@@ -65,19 +68,29 @@ This API integrates with external services to provide comprehensive stock data a
 
 #### Portfolio Value
 **Endpoint:** `GET /?queryPortfolioValue={symbols}`  
-**Description:** Calculates the total value of a portfolio given a comma-separated list of stock symbols.  
-**Example:** `GET /?queryPortfolioValue=AAPL,GOOGL,MSFT`  
+**Description:** Calculates the total value of a portfolio. Supports specifying quantity of each stock using the format `SYMBOL:QUANTITY`. If quantity is not provided, it defaults to 1.
+**Example:** `GET /?queryPortfolioValue=AAPL:2,MSFT:3`  
 **Example Response:** 
 ```json
 {
-  "portfolio_value_usd": 450.75,
+  "portfolio_value_usd": 1800.5,
   "stocks": [
-    {"symbol": "AAPL", "price": 150.25},
-    {"symbol": "GOOGL", "price": 200.0},
-    {"symbol": "MSFT", "price": 100.5}
+    {
+      "symbol": "AAPL",
+      "quantity": 2,
+      "price": 190.12,
+      "value": 380.24,
+      "weight_percent": 21.1
+    },
+    {
+      "symbol": "MSFT",
+      "quantity": 3,
+      "price": 473.42,
+      "value": 1420.26,
+      "weight_percent": 78.9
+    }
   ]
 }
-```
 
 #### Evaluation of Opportunity
 **Endpoint:** `GET /?queryEvaluateOpportunity={symbol}`  
@@ -139,8 +152,8 @@ The service is designed as a stateless application, which means that each reques
 
 [2] "Vercel: Using the REST API" [online]. [cited 2026-04-25]. Available at [https://vercel.com/docs/rest-api](https://vercel.com/docs/rest-api)
 
-[3] "Apify: Yahoo Finance API" [online]. [cited 2026-04-25]. Available at [https://apify.com/api/yahoo-finance-api](https://apify.com/api/yahoo-finance-api)
+[3] "Stooq Stock Data API" [online]. Available at [https://stooq.com/](https://stooq.com/)
 
-[4] "Github: yfinance" [online]. [cited 2026-04-25]. Available at [https://github.com/ranaroussi/yfinance](https://github.com/ranaroussi/yfinance)
+[4] "ExchangeRate API (open.er-api.com)" [online]. Available at [https://open.er-api.com/](https://open.er-api.com/)
 
 [5] "exchangerate.host: Real-time current and historical foreign exchange & crypto rates data solution." [online]. [cited 2026-04-25]. Available at [https://exchangerate.host/](https://exchangerate.host/)
