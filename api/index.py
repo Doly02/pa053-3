@@ -80,10 +80,11 @@ def airport_temp(code):
         r = requests.get(airport_url, timeout=10)
         airport_data = r.json()
 
-        if "city" not in airport_data:
-            raise ValueError("Invalid airport code")
+        location = airport_data.get("location")
 
-        city = airport_data["city"]
+        if not location:
+            raise ValueError("Invalid airport code")
+        city = location.split(",")[0]
 
         weather_url = f"https://wttr.in/{city}?format=j1"
         r = requests.get(weather_url, timeout=10)
