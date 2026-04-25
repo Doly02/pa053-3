@@ -303,7 +303,7 @@ def about():
     except Exception:
         weather = "Weather service temporarily unavailable"
 
-    return {
+    return jsonify({
         "service": "Investment Helper API",
         "author": "Tomas Dolak",
         "description": "REST API for stock data, portfolio analysis and investment calculations.",
@@ -341,4 +341,4 @@ def about():
                 "example": "/?queryLoanCost=100000,6,5"
             }
         }
-    }
+    })
