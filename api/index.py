@@ -62,25 +62,41 @@ def stock_summary(symbol):
 def portfolio_value(symbols):
     """
     Calculate the total value of a stock portfolio given a list of stock symbols.
-    symbols: A list of stock symbols (e.g., ["AAPL", "GOOGL", "MSFT"]).
+    symbols: A list of stock symbols (e.g., ["AAPL", "GOOGL", "MSFT"]) and optionally with quantities (e.g., ["AAPL:10", "GOOGL:5", "MSFT:20"]).
     """
     try:
         total = 0
         details = []
 
-        for sym in symbols:
+        for item in symbols:
+            if ":" in item:
+                sym, qty = item.split(":")
+                qty = int(qty)
+            else:
+                sym = item
+                qty = 1
+
             data = get_stock_price(sym)
             price = data["regularMarketPrice"]
-            total += price
+
+            value = price * qty
+            total += value
+
             details.append({
                 "symbol": sym,
-                "price": price
+                "quantity": qty,
+                "price": price,
+                "value": round(value, 2)
             })
 
+        for stock in details:
+            stock["weight_percent"] = round((stock["value"] / total) * 100, 2)
+
         return {
-            "portfolio_value_usd": total,
+            "portfolio_value_usd": round(total, 2),
             "stocks": details
         }
+
     except Exception as e:
         return {"ERR": str(e)}
 
