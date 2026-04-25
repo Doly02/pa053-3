@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 import requests
 import os
+import csv
+from io import StringIO
 
 app = Flask(__name__)
 
@@ -11,17 +13,33 @@ def get_stock_price(symbol):
     Get the current stock price for a given symbol using Yahoo Finance API.
     symbol: The stock symbol to look up (e.g., "AAPL").
     """
-    url = f"https://query1.finance.yahoo.com/v7/finance/quote?symbols={symbol}"
-    r = requests.get(url)
-    data = r.json()
-    return data["quoteResponse"]["result"][0]
+    url = f"https://stooq.com/q/l/?s={symbol.lower()}.us&f=sd2t2ohlcv&h&e=csv"
+    r = requests.get(url, timeout=10)
+    r.raise_for_status()
 
+    reader = csv.DictReader(StringIO(r.text))
+    row = next(reader)
+
+    if row["Close"] == "N/D":
+        raise ValueError(f"Stock symbol {symbol} was not found")
+
+    price = float(row["Close"])
+    open_price = float(row["Open"])
+
+    change_percent = ((price - open_price) / open_price) * 100 if open_price else 0
+
+    return {
+        "symbol": symbol.upper(),
+        "shortName": symbol.upper(),
+        "regularMarketPrice": price,
+        "regularMarketChangePercent": change_percent
+    }
 def get_usd_to_czk():
     """
     Get the current exchange rate from USD to CZK using exchangerate.host API.
     """
-    url = "https://api.exchangerate.host/latest?base=USD&symbols=CZK"
-    r = requests.get(url)
+    url = "https://open.er-api.com/v6/latest/USD"
+    r = requests.get(url, timeout=10)
     data = r.json()
     return data["rates"]["CZK"]
 
